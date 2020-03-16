@@ -1,0 +1,2 @@
+Client端将数1000发送给Server端
+UDP没有连接，所以没有严格的Client和Server
