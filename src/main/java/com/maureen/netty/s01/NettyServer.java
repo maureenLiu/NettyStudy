@@ -44,11 +44,14 @@ class ServerChildHandler extends ChannelInboundHandlerAdapter { //SimpleChannelI
         ByteBuf buf = null;
         try {
             buf = (ByteBuf) msg;
-            System.out.println(buf);
+            byte[] bytes = new byte[buf.readableBytes()];
+            buf.getBytes(buf.readerIndex(), bytes);
+            System.out.println(new String(bytes));
+            // System.out.println(buf);
             //System.out.println(buf.refCnt()); //有多少对象指向了它
         } finally {
             if (buf != null) ReferenceCountUtil.release(buf); //释放内存,防止泄露
-            System.out.println(buf.refCnt());
+            //System.out.println(buf.refCnt());
         }
 
     }
