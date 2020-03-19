@@ -47,12 +47,21 @@ class ServerChildHandler extends ChannelInboundHandlerAdapter { //SimpleChannelI
             byte[] bytes = new byte[buf.readableBytes()]; //buf.readableBytes()可读数据的字节数
             buf.getBytes(buf.readerIndex(), bytes); //从可读指针位置处开始读
             System.out.println(new String(bytes));
+
+            ctx.writeAndFlush(msg); //将接收到的数据写回到Client
+
             // System.out.println(buf);
             //System.out.println(buf.refCnt()); //有多少对象指向了它
         } finally {
-            if (buf != null) ReferenceCountUtil.release(buf); //释放内存,防止泄露
+            //如果执行了writeAndFlush就已经释放了内存，refCnt = 0,再释放就会出错
+            //if (buf != null) ReferenceCountUtil.release(buf); //释放内存,防止泄露
             //System.out.println(buf.refCnt());
         }
 
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
     }
 }

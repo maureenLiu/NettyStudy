@@ -7,6 +7,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.ReferenceCountUtil;
 
 public class Client {
     public static void main(String[] args) {
@@ -41,6 +42,8 @@ public class Client {
 
             System.out.println("sync over！......");
 
+            f.channel().closeFuture().sync(); //如果没有这句，客户端就停止了，与server端的连接就断掉了，那么如果server端往client端写数据就会出现异常
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -66,12 +69,23 @@ class ClientHandler extends ChannelInboundHandlerAdapter {
         //ByteBuf在虚拟机中直接访问操作系统的内存,叫做direct memory。buf指向的是直接内存，是操作系统的内存；不同于指向虚拟机内存，如果指向虚拟机内存，是不用管它释放与否
         //netty中往外写的所有内容都必须搞成ByteBuf，因为netty中读数据(channelRead)的时候，Object msg就是一个ByteBuf
         ByteBuf buf = Unpooled.copiedBuffer("hello".getBytes());
-        ctx.writeAndFlush(buf);
+        ctx.writeAndFlush(buf); //writeAndFlush自动释放内存
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        //
+        ByteBuf buf = null;
+        try {
+            buf = (ByteBuf) msg;
+            byte[] bytes = new byte[buf.readableBytes()]; //buf.readableBytes()可读数据的字节数
+            buf.getBytes(buf.readerIndex(), bytes); //从可读指针位置处开始读
+            System.out.println(new String(bytes));
+            // System.out.println(buf);
+            //System.out.println(buf.refCnt()); //有多少对象指向了它
+        } finally {
+            if (buf != null) ReferenceCountUtil.release(buf); //释放内存,防止泄露
+            //System.out.println(buf.refCnt());
+        }
     }
 
 
