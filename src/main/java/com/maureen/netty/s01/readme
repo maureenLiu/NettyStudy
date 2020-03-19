@@ -1,0 +1,30 @@
+1、EventLoopGroup:
+线程池，Event-网络IO事件；EventLoopGroup-事件处理的线程池
+线程池用于处理channel上的所有事件，连接是线程池中的一个线程去完成的，读也是线程池中的一个线程完成的，依此推论
+
+2、netty中所有方法都是异步的，如果要等方法执行完成，就要调用sync()。
+
+3、如下code即可连上server：b.group().channel().handler().connect().sync()
+b.group(group)                                      //指定哪个线程池来执行
+ .channel(NioSocketChannel.class)           //指定连到服务器上的channel的类型；如果传入SocketChannel，就是BIO版，是阻塞版
+ .handler(new ClientChannelInitializer())   //事件发生时交给哪个Handler处理
+ .connect("localhost",8888)      //线程池中的一个线程去完成的connect操作，connect是一个异步方法，要想等该方法执行完成才能往下继续执行，必须要执行sync()
+ .sync();                       //sync()等待执行结束才会继续往下执行
+
+4、上面code的另一种写法：
+ ChannelFuture f = b.group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ClientChannelInitializer())
+                    .connect("localhost",8888);
+//如果不加sync，ChannelFuture是否执行成功，需要设置Listener来监听，因为connect比较耗时，所以不能直接就判断future结果
+f.addListener(new ChannelFutureListener() {
+    //执行结果一出来，operationComplete就会被调用
+    @Override
+    public void operationComplete(ChannelFuture future) throws Exception {
+           if(!future.isSuccess())  //不启动Server，直接执行Client时就会输出"Not connected!"
+               System.out.println("Not connected!");
+            else
+               System.out.println("connected!");
+     }
+});
+f.sync(); //阻塞直到有结果为止
