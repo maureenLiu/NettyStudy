@@ -44,8 +44,8 @@ class ServerChildHandler extends ChannelInboundHandlerAdapter { //SimpleChannelI
         ByteBuf buf = null;
         try {
             buf = (ByteBuf) msg;
-            byte[] bytes = new byte[buf.readableBytes()];
-            buf.getBytes(buf.readerIndex(), bytes);
+            byte[] bytes = new byte[buf.readableBytes()]; //buf.readableBytes()可读数据的字节数
+            buf.getBytes(buf.readerIndex(), bytes); //从可读指针位置处开始读
             System.out.println(new String(bytes));
             // System.out.println(buf);
             //System.out.println(buf.refCnt()); //有多少对象指向了它
