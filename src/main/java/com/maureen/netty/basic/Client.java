@@ -1,4 +1,4 @@
-package com.maureen.netty;
+package com.maureen.netty.basic;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
