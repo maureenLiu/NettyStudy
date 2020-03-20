@@ -1,0 +1,10 @@
+Client端接收到channelRead后更新界面
+把ClientFrame换成单例
+在main中显示
+
+ClientHandler接收到数据后更新frame中的ta
+
+重构actionPerformed
+实现了基础的聊天功能
+
+但是存在问题：某个客户端停止运行的时候，服务端收到其他客户端发送的消息后还会转发给这个出现异常的客户端，服务端就会出现异常
