@@ -1,0 +1,6 @@
+加入ServerFrame
+设为单例
+
+添加server的serverStart方法，并在成功启动后给出提示
+
+存在问题：serverStart是在UI线程中调用的，serverStart中的closeFuture是阻塞的，所以UI线程就被阻塞了，任何操作都没有反应
