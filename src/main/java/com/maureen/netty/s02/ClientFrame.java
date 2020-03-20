@@ -8,7 +8,6 @@ public class ClientFrame extends Frame {
     TextArea ta = new TextArea(); //多行文本
     TextField tf = new TextField(); //单行文本
 
-
     public ClientFrame() {
         this.setSize(600, 400);
         this.setLocation(100, 20);
